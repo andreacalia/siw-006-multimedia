@@ -159,4 +159,21 @@ $(document).ready(function() {
 
     appMaster.placeHold();
 
+    var map = L.map('map').setView([51.505, -0.09], 13);
+    var OpenStreetMap_Mapnik = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    });
+    map.dragging.disable();
+    OpenStreetMap_Mapnik.addTo(map);
+
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
+
+        L.marker(e.latlng).addTo(map);
+
+        L.circle(e.latlng, radius).addTo(map);
+    }
+
+    map.on('locationfound', onLocationFound);
+    map.locate({setView: true, maxZoom: 16});
 });
