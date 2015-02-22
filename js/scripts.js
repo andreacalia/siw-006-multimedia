@@ -138,6 +138,21 @@ var appMaster = {
     placeHold: function(){
         // run Placeholdem on all elements with placeholders
         Placeholdem(document.querySelectorAll('[placeholder]'));
+    },
+
+    toggleMapDragging: function(map, button) {
+        if( !map.dragging ) // Device does not support dragging
+            return;
+        
+        if( map.dragging.enabled() ) {
+            // Icon with unlock
+            map.dragging.disable();
+            $(button).children(':first').removeClass('fa-unlock').addClass('fa-lock');
+        } else {
+            // Icon with lock
+            map.dragging.enable();
+            $(button).children(':first').removeClass('fa-lock').addClass('fa-unlock');
+        }
     }
 
 }; // AppMaster
@@ -159,11 +174,13 @@ $(document).ready(function() {
 
     appMaster.placeHold();
 
-    var map = L.map('map').setView([51.505, -0.09], 13);
+    var map = L.map('map', {'dragging': false}).setView([51.505, -0.09], 13);
+    map.dragging ? map.dragging.disable() : null; // Disable dragging if the device supports it
+    map.tap ? map.tap.disable() : null; // Allow touch scroll on mobile devices
+
     var OpenStreetMap_Mapnik = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
-    map.dragging.disable();
     OpenStreetMap_Mapnik.addTo(map);
 
     function onLocationFound(e) {
@@ -176,4 +193,8 @@ $(document).ready(function() {
 
     map.on('locationfound', onLocationFound);
     map.locate({setView: true, maxZoom: 16});
+
+    $('#toggle-map-pan').on('click', function(evt) {
+        appMaster.toggleMapDragging(map, this);
+    });
 });
